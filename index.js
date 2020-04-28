@@ -20,6 +20,7 @@ if (!PARSE_MASTER_KEY){
 }
 
 const parseUrl = `http://localhost:${PORT}/parse`
+const dashboardParseUrl = process.env.DASHBOARD_PARSE_URL || parseUrl
 const parseDB = process.env.DATABASE_URL + '?ssl=true'
 
 const parseApi = new ParseServer({
@@ -34,7 +35,7 @@ const parseApi = new ParseServer({
 const parseDashboard = new ParseDashboard({
   "apps": [
     {
-      "serverURL": parseUrl,
+      "serverURL": dashboardParseUrl,
       "appId": "ftg-2020",
       "masterKey": PARSE_MASTER_KEY,
       "appName": "ftg-2020"
