@@ -7,10 +7,52 @@ const pool = new Pool({
 const cool = require('cool-ascii-faces')
 const express = require('express')
 const path = require('path')
+const ParseServer = require('parse-server').ParseServer;
+const ParseDashboard = require('parse-dashboard');
+
 const PORT = process.env.PORT || 5000
+
+const PARSE_MASTER_KEY = process.env.PARSE_MASTER_KEY
+
+if (!PARSE_MASTER_KEY){
+  console.log('PARSE_MASTER_KEY must defined as an environment variable!')
+  process.exit(13)
+}
+
+const parseUrl = `http://localhost:${PORT}/parse`
+const parseDB = process.env.DATABASE_URL + '?ssl=true'
+
+const parseApi = new ParseServer({
+  "appId": "ftg-2020",
+  "masterKey": PARSE_MASTER_KEY,
+  "appName": "ftg-2020",
+  "cloud": "./cloud/main",
+  "databaseURI": parseDB,
+  serverURL: parseUrl
+})
+
+const parseDashboard = new ParseDashboard({
+  "apps": [
+    {
+      "serverURL": parseUrl,
+      "appId": "ftg-2020",
+      "masterKey": PARSE_MASTER_KEY,
+      "appName": "ftg-2020"
+    }
+  ],
+  users: [
+    {
+      user: "csaba",
+      pass: PARSE_MASTER_KEY
+    }
+  ],
+  useEncryptedPasswords: false
+})
 
 express()
   .use(express.static(path.join(__dirname, 'public')))
+  .use('/parse', parseApi)
+  .use('/dashboard', parseDashboard)
   .set('views', path.join(__dirname, 'views'))
   .set('view engine', 'ejs')
   .get('/', (req, res) => res.render('pages/index'))
