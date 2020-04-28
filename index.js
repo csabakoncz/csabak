@@ -40,6 +40,7 @@ const parseDashboard = new ParseDashboard({
       "appName": "ftg-2020"
     }
   ],
+  trustProxy: 1,
   users: [
     {
       user: "csaba",
