@@ -29,6 +29,7 @@ const parseApi = new ParseServer({
   "appName": "ftg-2020",
   "cloud": "./cloud/main",
   "databaseURI": parseDB,
+  allowClientClassCreation: false,
   serverURL: parseUrl
 })
 
