@@ -9,6 +9,9 @@ const express = require('express')
 const path = require('path')
 const ParseServer = require('parse-server').ParseServer;
 const ParseDashboard = require('parse-dashboard');
+const {crypt_check} = require('./firebase-auth')
+const  cors = require('cors')
+const bp = require('body-parser')
 
 const PORT = process.env.PORT || 5000
 
@@ -53,6 +56,8 @@ const parseDashboard = new ParseDashboard({
 })
 
 express()
+  // .options('*', cors())
+  .use(cors())
   .use(express.static(path.join(__dirname, 'public')))
   .use('/parse', parseApi)
   .use('/dashboard', parseDashboard)
@@ -60,6 +65,7 @@ express()
   .set('view engine', 'ejs')
   .get('/', (req, res) => res.render('pages/index'))
   .get('/cool', (req, res) => res.send(cool()))
+  .post('/crypt_check', bp.json(), crypt_check)
   .get('/db', async (req, res) => {
     try {
       const client = await pool.connect()
