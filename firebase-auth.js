@@ -1,6 +1,7 @@
 var admin = require("firebase-admin");
 const secp256k1 = require('ethereum-cryptography/secp256k1')
 const { sha256 } = require("ethereum-cryptography/sha256");
+const sigUtil = require('eth-sig-util')
 
 const FIREBASE_SERVICE_ACCOUNT = process.env.FIREBASE_SERVICE_ACCOUNT
 
@@ -17,6 +18,7 @@ admin.initializeApp({
 });
 
 exports.crypt_check=crypt_check
+exports.crypt_check2=crypt_check2
 
 async function crypt_check(req,res){
     if(!req.body){
@@ -57,3 +59,47 @@ async function crypt_check(req,res){
     }
 
   }
+
+async function crypt_check2(req,res){
+
+  if(!req.body){
+      res.status(400).send({msg:'Post request body'})
+      return
+  }
+
+  let reqJson = req.body
+
+  let user = reqJson.user
+  let pass = reqJson.pass
+
+  // console.log('user', user)
+  // console.log('pass', pass)
+
+  if(!user || !pass){
+      res.status(400).send({msg: 'Post user and pass in the request body'})
+      return
+  }
+
+  let msg = user
+  let sig = pass
+
+  const msgParams = {
+    data: msg,
+    sig: sig
+  };
+
+  const recovered = sigUtil.recoverPersonalSignature(msgParams);
+  const address = user.split(':')[0]
+
+  let check = (address == recovered)
+
+  if(check){
+      let token = await admin.auth().createCustomToken(user, {username : user.split(':')[1]})
+      res.status(200).send({user:user, token});
+  }
+  else{
+      res.status(401).send({msg:'check failed'});
+  }
+
+}
+
