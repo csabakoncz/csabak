@@ -89,12 +89,12 @@ async function crypt_check2(req,res){
   };
 
   const recovered = sigUtil.recoverPersonalSignature(msgParams);
-  const address = user.split(':')[0]
+  const address = user
 
   let check = (address == recovered)
 
   if(check){
-      let token = await admin.auth().createCustomToken(user, {username : user.split(':')[1]})
+      let token = await admin.auth().createCustomToken(user, {csaba : 'custom info'})
       res.status(200).send({user:user, token});
   }
   else{
